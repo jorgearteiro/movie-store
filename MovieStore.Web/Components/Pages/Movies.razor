@@ -1,0 +1,58 @@
+﻿@page "/movies"
+@rendermode InteractiveServer
+
+
+@inject IConfiguration Configuration
+@inject MovieStore.Web.MovieService MovieService
+
+<PageTitle>Movies</PageTitle>
+    <h1>Movies</h1>
+
+    <p>Select the video you want to watch</p>
+
+    @if (movieList == null)
+{
+    <p><em>Loading...</em></p>
+}
+else
+{
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Title</th>
+                <th>Video</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var movie in movieList)
+            {
+                <tr>
+                    <td>@movie.Title</td>
+                    <td>
+                        <button @onclick="@(async () => await WatchMovie(movie.Id))">Watch</button>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+    <video controls src="@($"{videoUrl}")" width="360" height="180"></video>
+}
+
+@code {
+    private string? baseUrl { get; set; }
+    private string? videoUrl { get; set; }
+    private List<Movie>? movieList;
+
+    protected override async Task OnInitializedAsync()
+    {
+        baseUrl = Environment.GetEnvironmentVariable("services__apiservice__https__0") ?? Configuration["services__apiservice__https__0"];
+        movieList = await MovieService.GetMoviesAsync();
+        //videoUrl = $"{baseUrl}/movies/stream/2";
+    }
+
+    public async Task WatchMovie(int movieId)
+    {
+        videoUrl = $"{baseUrl}/movies/stream/{movieId}";
+        await InvokeAsync(StateHasChanged);
+    }
+}

@@ -1,0 +1,48 @@
+---
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: apiservice
+  labels:
+    app: apiservice
+spec:
+  serviceName: apiservice    
+  replicas: 1
+  selector:
+    matchLabels:
+      app: apiservice
+  template:
+    metadata:
+      labels:
+        app: apiservice
+    spec:
+      securityContext:
+        fsGroup: 123
+      containers:
+      - name: apiservice
+        image: jorgearteiro/apiservice:latest
+        imagePullPolicy: Always
+        ports:
+        - name: http
+          containerPort: 8080
+        - name: https
+          containerPort: 8443
+        envFrom:
+        - configMapRef:
+            name: apiservice-env
+        volumeMounts:
+        - name: apiservice-ephemeralpv
+          mountPath: /app/files
+      volumes:
+        - name: apiservice-ephemeralpv
+          ephemeral:
+            volumeClaimTemplate:
+              metadata:
+                labels:
+                  type: apiservice-ephemeral-volume
+              spec:
+                accessModes: ["ReadWriteOnce"]
+                storageClassName: acstor-ephemeraldisk-nvme
+                resources:
+                  requests:
+                    storage: 5Gi

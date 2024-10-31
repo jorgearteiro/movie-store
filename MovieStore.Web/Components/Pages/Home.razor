@@ -1,0 +1,23 @@
+﻿@page "/"
+
+@inject IConfiguration Configuration
+
+<PageTitle>Home</PageTitle>
+
+<h2>Movie Store running on AKS - Azure Kubernetes Services </h2>
+<p></p>
+<h4>using Azure Container Storage Ephemeral disks with replicas for Resilience, Caching and Performance. </h4>
+<p></p>
+
+
+<video controls src="@($"{baseUrl}/movies/stream/1")" width="720" height="360"></video>
+<h5>AKS Container Storage Kafka Demo Video</h5>
+@code {
+    private string? baseUrl { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+        baseUrl = Environment.GetEnvironmentVariable("services__apiservice__https__0") ?? Configuration["services__apiservice__https__0"];
+    }
+
+}
