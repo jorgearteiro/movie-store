@@ -45,9 +45,11 @@ else
 
     protected override async Task OnInitializedAsync()
     {
-        baseUrl = Environment.GetEnvironmentVariable("services__apiservice__https__0") ?? Configuration["services__apiservice__https__0"];
+        baseUrl = Environment.GetEnvironmentVariable("apiservice__publicdomain__http_0")
+                  ?? Environment.GetEnvironmentVariable("services__apiservice__https__0") 
+                  ?? Configuration["services__apiservice__https__0"];
+
         movieList = await MovieService.GetMoviesAsync();
-        //videoUrl = $"{baseUrl}/movies/stream/2";
     }
 
     public async Task WatchMovie(int movieId)

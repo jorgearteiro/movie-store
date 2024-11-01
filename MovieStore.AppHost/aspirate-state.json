@@ -1,19 +1,12 @@
 {
   "projectPath": ".",
   "inputPath": "aspirate-output",
-  "outputPath": "aspirate-output",
-  "namespace": "moviestore",
   "containerImageTags": [
     "latest"
   ],
-  "imagePullPolicy": "Always",
   "containerBuilder": "docker",
   "kubeContext": "aks-storage-actions",
   "outputFormat": "kustomize",
-  "skipFinalKustomizeGeneration": false,
-  "privateRegistryEmail": "aspir8@aka.ms",
-  "includeDashboard": true,
-  "useCustomNamespace": true,
   "secrets": {
     "salt": "4spyJFsbf/8pKGc4",
     "hash": "ARVcFhUmmnqxvyBXNwSx7Db6wr20FYxLdBv2OQuzVqA=",

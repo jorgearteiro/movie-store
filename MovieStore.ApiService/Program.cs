@@ -8,6 +8,22 @@ builder.AddServiceDefaults();
 // Add services to the container.
 builder.Services.AddProblemDetails();
 
+// Add CORS
+builder.Services.AddCors
+    (
+    options =>
+    {
+        options.AddDefaultPolicy
+        (
+            builder =>
+            {
+                builder.AllowAnyOrigin().AllowAnyMethod().AllowAnyHeader()
+                       .WithExposedHeaders("strict-origin-when-cross-origin");
+            }
+        );
+    }
+);
+
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
@@ -56,6 +72,8 @@ videoApi.MapGet("/stream/{id}", (int id) =>
 });
 
 app.MapDefaultEndpoints();
+
+app.UseCors();
 
 app.Run();
 

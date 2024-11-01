@@ -13,7 +13,8 @@ configMapGenerator:
     - OTEL_DOTNET_EXPERIMENTAL_OTLP_RETRY=in_memory
     - ASPNETCORE_FORWARDEDHEADERS_ENABLED=true
     - HTTP_PORTS=8080
-    - services__apiservice__http__0=http://apiservice:8080
+    - services__apiservice__http__0=http://apiservice:80
+    - apiservice__publicdomain__http_0=http://apiservice.azuretar.com
     - OTEL_EXPORTER_OTLP_ENDPOINT=http://aspire-dashboard:18889
     - OTEL_SERVICE_NAME=webfrontend
     - ASPNETCORE_URLS=http://+:8080;

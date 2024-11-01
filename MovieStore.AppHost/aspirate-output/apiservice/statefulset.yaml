@@ -1,4 +1,3 @@
----
 apiVersion: apps/v1
 kind: StatefulSet
 metadata:
@@ -25,24 +24,22 @@ spec:
         ports:
         - name: http
           containerPort: 8080
-        - name: https
-          containerPort: 8443
         envFrom:
         - configMapRef:
             name: apiservice-env
         volumeMounts:
-        - name: apiservice-ephemeralpv
+        - name: apiservice-pv
           mountPath: /app/files
-      volumes:
-        - name: apiservice-ephemeralpv
-          ephemeral:
-            volumeClaimTemplate:
-              metadata:
-                labels:
-                  type: apiservice-ephemeral-volume
-              spec:
-                accessModes: ["ReadWriteOnce"]
-                storageClassName: acstor-ephemeraldisk-nvme
-                resources:
-                  requests:
-                    storage: 5Gi
+  volumeClaimTemplates:
+  - metadata:
+      name: apiservice-pv
+      labels:
+        type: apiservice-ephemeral-volume
+      annotations:
+        acstor.azure.com/accept-ephemeral-storage: "true"
+    spec:
+      accessModes: ["ReadWriteOnce"]
+      storageClassName: acstor-ephemeraldisk-nvme
+      resources:
+        requests:
+          storage: 5Gi
