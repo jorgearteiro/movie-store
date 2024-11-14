@@ -9,5 +9,5 @@ spec:
     app: apiservice
   ports:
   - name: http
-    port: 8080
     nodePort: 32702
+    port: 8080

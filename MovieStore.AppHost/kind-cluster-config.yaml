@@ -1,0 +1,17 @@
+apiVersion: kind.x-k8s.io/v1alpha4
+kind: Cluster
+nodes:
+- role: control-plane
+  extraPortMappings:
+  # Webfrontend
+  - containerPort: 32701
+    hostPort: 8081
+  # ApiService
+  - containerPort: 32702
+    hostPort: 8082
+  # AspireDashboard UI
+  - containerPort: 32703
+    hostPort: 8083
+  # AspireDashboard OTLP
+  - containerPort: 32704
+    hostPort: 8084

@@ -1,0 +1,37 @@
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: apiservice
+  labels:
+    app: apiservice
+spec:
+  minReadySeconds: 60
+  replicas: 1
+  selector:
+    matchLabels:
+      app: apiservice
+  strategy:
+    type: Recreate
+  template:
+    metadata:
+      labels:
+        app: apiservice
+    spec:
+      containers:
+      - name: apiservice
+        image: jorgearteiro/apiservice:latest
+        imagePullPolicy: Always
+        ports:
+        - name: http
+          containerPort: 8080
+        envFrom:
+        - configMapRef:
+            name: apiservice-env
+        volumeMounts:
+        - name: apiservice-pv
+          mountPath: /app/files
+      terminationGracePeriodSeconds: 180
+      volumes:
+      - name: apiservice-pv
+        emptyDir: {}      

@@ -2,25 +2,25 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: webfrontend
+  name: apiservice
   labels:
-    app: webfrontend
+    app: apiservice
 spec:
   minReadySeconds: 60
   replicas: 1
   selector:
     matchLabels:
-      app: webfrontend
+      app: apiservice
   strategy:
     type: Recreate
   template:
     metadata:
       labels:
-        app: webfrontend
+        app: apiservice
     spec:
       containers:
-      - name: webfrontend
-        image: jorgearteiro/webfrontend:latest
+      - name: apiservice
+        image: jorgearteiro/apiservice:latest
         imagePullPolicy: Always
         ports:
         - name: http
@@ -29,5 +29,11 @@ spec:
           containerPort: 8443
         envFrom:
         - configMapRef:
-            name: webfrontend-env
+            name: apiservice-env
+        volumeMounts:
+        - name: apiservice-pv
+          mountPath: /app/files
       terminationGracePeriodSeconds: 180
+      volumes:
+      - name: apiservice-pv
+        emptyDir: {}   

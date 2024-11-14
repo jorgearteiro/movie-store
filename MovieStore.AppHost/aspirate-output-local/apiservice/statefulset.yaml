@@ -1,0 +1,33 @@
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: apiservice
+  labels:
+    app: apiservice
+spec:
+  serviceName: apiservice    
+  replicas: 1
+  selector:
+    matchLabels:
+      app: apiservice
+  template:
+    metadata:
+      labels:
+        app: apiservice
+    spec:
+      containers:
+      - name: apiservice
+        image: jorgearteiro/apiservice:latest
+        imagePullPolicy: Always
+        ports:
+        - name: http
+          containerPort: 8080
+        envFrom:
+        - configMapRef:
+            name: apiservice-env
+        volumeMounts:
+        - name: apiservice-pv
+          mountPath: /app/files
+      volumes:
+      - name: apiservice-pv
+        emptyDir: {}

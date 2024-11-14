@@ -4,11 +4,10 @@ kind: Service
 metadata:
   name: webfrontend
 spec:
-  type: NodePort
+  type: LoadBalancer
   selector:
     app: webfrontend
   ports:
   - name: http
-    port: 8080
-    nodePort: 32701
-
+    port: 80
+    targetPort: 8080

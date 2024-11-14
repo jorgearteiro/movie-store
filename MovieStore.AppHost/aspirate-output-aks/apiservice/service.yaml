@@ -4,10 +4,10 @@ kind: Service
 metadata:
   name: apiservice
 spec:
-  type: NodePort
+  type: LoadBalancer
   selector:
     app: apiservice
   ports:
   - name: http
-    port: 8080
-    nodePort: 32702
+    port: 80
+    targetPort: 8080

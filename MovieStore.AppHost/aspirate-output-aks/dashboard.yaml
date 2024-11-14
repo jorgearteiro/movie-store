@@ -44,9 +44,9 @@ spec:
     - name: dashboard-ui
       protocol: TCP
       port: 18888
-      nodePort: 32703
+      targetPort: 18888
     - name: otlp
       protocol: TCP
       port: 18889
-      nodePort: 32704
-  type: NodePort
+      targetPort: 18889
+  type: ClusterIP

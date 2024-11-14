@@ -1,0 +1,17 @@
+{
+    "feature": {
+        "network": {
+            "incoming": "steal",
+            "outgoing": true
+        },
+        "fs": "write",
+        "env": true
+    },
+    "agent": {
+        "namespace": "moviestore"
+    },
+    "target": {
+        "path": "pod/webfrontend-5d75d87474-lb6nn",
+        "namespace": "moviestore"
+    }
+}

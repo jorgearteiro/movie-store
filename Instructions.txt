@@ -1,0 +1,53 @@
+
+
+# Get all Kubernetes contexts
+kubectl config get-contexts
+
+# Get the current Kubernetes context
+kubectl config current-context
+
+# Set the current Kubernetes context
+kubectl config use-context aks-storage-actions
+
+kubectl config use-context kind-kind
+
+kubectl config use-context kind-kind-netconf
+
+# cretate Kind cluster
+kind create cluster --config=kind-cluster-config.yaml
+
+kind create cluster --name kind-netconf --config=kind-cluster-config-netconf.yaml
+
+# Generate the Kubernetes manifests
+aspirate init 
+aspirate generate -o ./aspirate-output
+
+# Docker push Container Images to Docker Hub
+docker push jorgearteiro/webfrontend:latest
+docker push jorgearteiro/apiservice:latest
+
+# Docker push Container Images to kind Cluster
+kind load docker-image jorgearteiro/webfrontend:latest --name kind-netconf
+kind load docker-image jorgearteiro/apiservice:latest --name kind-netconf
+
+# Apply Or Delete the Kubernetes manifests
+kubectl apply --server-side -k /home/jorge/source/github/jorgearteiro/movie-store/MovieStore.AppHost/aspirate-output-dev
+kubectl delete -k /home/jorge/source/github/jorgearteiro/movie-store/MovieStore.AppHost/aspirate-output-dev --wait=false
+
+kubectl apply --server-side -k /home/jorge/source/github/jorgearteiro/movie-store/MovieStore.AppHost/aspirate-output-aks
+kubectl delete -k /home/jorge/source/github/jorgearteiro/movie-store/MovieStore.AppHost/aspirate-output-aks --wait=false
+
+kubectl apply --server-side -k /home/jorge/source/github/jorgearteiro/movie-store/MovieStore.AppHost/aspirate-output-local
+kubectl delete -k /home/jorge/source/github/jorgearteiro/movie-store/MovieStore.AppHost/aspirate-output-local --wait=false
+
+
+# Apply Or Delete the Kubernetes manifests using Aspirate CLI
+aspirate apply -i ./aspirate-output-aks -k aks-storage-actions
+aspirate apply -i ./aspirate-output-dev -k kind-kind
+aspirate apply -i ./aspirate-output-dev -k kind-kind-netconf
+
+# Debug the application using Mirrord CLI
+mirrord exec -n moviestore -a moviestore -t pod/apiservice-0 dotnet MovieStore.ApiService.dll
+
+# WSL KubeConfig location
+\\wsl.localhost\Ubuntu-24.04\home\jorge\.kube
