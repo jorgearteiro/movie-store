@@ -1,0 +1,17 @@
+---
+apiVersion: "v1"
+kind: "ConfigMap"
+metadata:
+  name: "webfrontend-config"
+  labels:
+    app: "aspire"
+    component: "webfrontend"
+data:
+  ASPNETCORE_URLS: "{{ .Values.config.webfrontend.ASPNETCORE_URLS }}"
+  OTEL_DOTNET_EXPERIMENTAL_OTLP_EMIT_EXCEPTION_LOG_ATTRIBUTES: "{{ .Values.config.webfrontend.OTEL_DOTNET_EXPERIMENTAL_OTLP_EMIT_EXCEPTION_LOG_ATTRIBUTES }}"
+  OTEL_DOTNET_EXPERIMENTAL_OTLP_EMIT_EVENT_LOG_ATTRIBUTES: "{{ .Values.config.webfrontend.OTEL_DOTNET_EXPERIMENTAL_OTLP_EMIT_EVENT_LOG_ATTRIBUTES }}"
+  OTEL_DOTNET_EXPERIMENTAL_OTLP_RETRY: "{{ .Values.config.webfrontend.OTEL_DOTNET_EXPERIMENTAL_OTLP_RETRY }}"
+  ASPNETCORE_FORWARDEDHEADERS_ENABLED: "{{ .Values.config.webfrontend.ASPNETCORE_FORWARDEDHEADERS_ENABLED }}"
+  HTTP_PORTS: "{{ .Values.config.webfrontend.HTTP_PORTS }}"
+  services__apiservice__http__0: "{{ .Values.config.webfrontend.services__apiservice__http__0 }}"
+  services__apiservice__https__0: "{{ .Values.config.webfrontend.services__apiservice__https__0 }}"

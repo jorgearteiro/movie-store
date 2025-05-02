@@ -15,7 +15,7 @@ configMapGenerator:
     - HTTP_PORTS=8080
     - ASPNETCORE_ENVIRONMENT=Development    
     - services__apiservice__http__0=http://apiservice:8080
-    - apiservice__publicdomain__http_0=http://127.0.0.1:8092    
+    - apiservice__publicdomain__http_0=http://127.0.0.1:61141  
     - OTEL_EXPORTER_OTLP_ENDPOINT=http://aspire-dashboard:18889
     - OTEL_SERVICE_NAME=webfrontend
     - ASPNETCORE_URLS=http://+:8080;

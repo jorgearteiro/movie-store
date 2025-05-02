@@ -1,0 +1,37 @@
+---
+apiVersion: "apps/v1"
+kind: "Deployment"
+metadata:
+  name: "apiservice-deployment"
+spec:
+  template:
+    metadata:
+      labels:
+        app: "aspire"
+        component: "apiservice"
+    spec:
+      containers:
+        - image: "{{ .Values.parameters.apiservice.apiservice_image }}"
+          name: "apiservice"
+          envFrom:
+            - configMapRef:
+                name: "apiservice-config"
+          ports:
+            - name: "http"
+              protocol: "TCP"
+              containerPort: "{{ .Values.parameters.apiservice.port_http }}"
+            - name: "https"
+              protocol: "TCP"
+              containerPort: "{{ .Values.parameters.apiservice.port_https }}"
+          imagePullPolicy: "IfNotPresent"
+  selector:
+    matchLabels:
+      app: "aspire"
+      component: "apiservice"
+  replicas: 1
+  revisionHistoryLimit: 3
+  strategy:
+    rollingUpdate:
+      maxSurge: 1
+      maxUnavailable: 1
+    type: "RollingUpdate"

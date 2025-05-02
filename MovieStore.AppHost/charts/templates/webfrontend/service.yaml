@@ -1,0 +1,19 @@
+---
+apiVersion: "v1"
+kind: "Service"
+metadata:
+  name: "webfrontend-service"
+spec:
+  type: "ClusterIP"
+  selector:
+    app: "aspire"
+    component: "webfrontend"
+  ports:
+    - name: "http"
+      protocol: "TCP"
+      port: "{{ .Values.parameters.webfrontend.port_http }}"
+      targetPort: "{{ .Values.parameters.webfrontend.port_http }}"
+    - name: "https"
+      protocol: "TCP"
+      port: "{{ .Values.parameters.webfrontend.port_https }}"
+      targetPort: "{{ .Values.parameters.webfrontend.port_https }}"

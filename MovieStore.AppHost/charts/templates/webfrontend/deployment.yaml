@@ -1,0 +1,37 @@
+---
+apiVersion: "apps/v1"
+kind: "Deployment"
+metadata:
+  name: "webfrontend-deployment"
+spec:
+  template:
+    metadata:
+      labels:
+        app: "aspire"
+        component: "webfrontend"
+    spec:
+      containers:
+        - image: "{{ .Values.parameters.webfrontend.webfrontend_image }}"
+          name: "webfrontend"
+          envFrom:
+            - configMapRef:
+                name: "webfrontend-config"
+          ports:
+            - name: "http"
+              protocol: "TCP"
+              containerPort: "{{ .Values.parameters.webfrontend.port_http }}"
+            - name: "https"
+              protocol: "TCP"
+              containerPort: "{{ .Values.parameters.webfrontend.port_https }}"
+          imagePullPolicy: "IfNotPresent"
+  selector:
+    matchLabels:
+      app: "aspire"
+      component: "webfrontend"
+  replicas: 1
+  revisionHistoryLimit: 3
+  strategy:
+    rollingUpdate:
+      maxSurge: 1
+      maxUnavailable: 1
+    type: "RollingUpdate"

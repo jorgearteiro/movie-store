@@ -17,7 +17,7 @@ spec:
       terminationGracePeriodSeconds: 30
       containers:
         - name: aspire-dashboard
-          image: mcr.microsoft.com/dotnet/aspire-dashboard:8.0
+          image: mcr.microsoft.com/dotnet/aspire-dashboard:9.1
           resources:
             requests:
               cpu: "500m"

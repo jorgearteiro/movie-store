@@ -1,5 +1,6 @@
 {
   "projectPath": ".",
+  "inputPath": "./aspirate-output-dev",
   "outputPath": "aspirate-output",
   "namespace": "moviestore",
   "containerImageTags": [
@@ -8,6 +9,7 @@
   "imagePullPolicy": "Always",
   "containerBuilder": "docker",
   "containerRepositoryPrefix": "jorgearteiro",
+  "kubeContext": "docker-desktop",
   "outputFormat": "kustomize",
   "skipFinalKustomizeGeneration": false,
   "privateRegistryEmail": "aspir8@aka.ms",

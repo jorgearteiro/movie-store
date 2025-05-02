@@ -1,0 +1,19 @@
+---
+apiVersion: "v1"
+kind: "Service"
+metadata:
+  name: "apiservice-service"
+spec:
+  type: "ClusterIP"
+  selector:
+    app: "aspire"
+    component: "apiservice"
+  ports:
+    - name: "http"
+      protocol: "TCP"
+      port: "{{ .Values.parameters.apiservice.port_http }}"
+      targetPort: "{{ .Values.parameters.apiservice.port_http }}"
+    - name: "https"
+      protocol: "TCP"
+      port: "{{ .Values.parameters.apiservice.port_https }}"
+      targetPort: "{{ .Values.parameters.apiservice.port_https }}"
