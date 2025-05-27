@@ -8,8 +8,8 @@ builder.AddProject<Projects.MovieStore_Web>("webfrontend")
     .WithReference(apiService)
     .WaitFor(apiService);
 
-builder.AddDockerComposePublisher();
+builder.AddDockerComposeEnvironment("docker-compose");
 
-builder.AddKubernetesPublisher();
+builder.AddKubernetesEnvironment("kube");
 
 builder.Build().Run();
