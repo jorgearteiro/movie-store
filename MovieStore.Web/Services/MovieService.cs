@@ -56,10 +56,10 @@ public class MovieService(HttpClient httpClient)
     public async Task<Movie?> AddMovieWithFileAsync(string title, Stream fileStream, string fileName, string contentType, CancellationToken cancellationToken = default)
     {
         using var content = new MultipartFormDataContent();
-        
+
         // Add title
         content.Add(new StringContent(title), "title");
-        
+
         // Add file
         var fileContent = new StreamContent(fileStream);
         fileContent.Headers.ContentType = new System.Net.Http.Headers.MediaTypeHeaderValue(contentType);
@@ -78,7 +78,7 @@ public class MovieService(HttpClient httpClient)
         }
 
         return null;
-
+    }
     public async Task<bool> DeleteMovieAsync(int movieId, CancellationToken cancellationToken = default)
     {
         var response = await httpClient.DeleteAsync($"/movies/{movieId}", cancellationToken);
