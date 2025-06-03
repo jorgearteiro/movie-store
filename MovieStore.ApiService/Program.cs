@@ -77,6 +77,19 @@ videoApi.MapPost("/", async (Movie movie, MovieStoreContext context) =>
     return Results.Created($"/movies/{movie.Id}", movie);
 });
 
+videoApi.MapDelete("/{id}", async (int id, MovieStoreContext context) =>
+{
+    var movie = await context.Movies.FindAsync(id);
+    if (movie == null)
+    {
+        return Results.NotFound();
+    }
+    
+    context.Movies.Remove(movie);
+    await context.SaveChangesAsync();
+    return Results.NoContent();
+});
+
 videoApi.MapGet("/stream/{id}", async (int id, MovieStoreContext context) =>
 {
     var movie = await context.Movies.FindAsync(id);

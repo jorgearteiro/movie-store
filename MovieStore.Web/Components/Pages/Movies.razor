@@ -21,6 +21,7 @@ else
             <tr>
                 <th>Title</th>
                 <th>Video</th>
+                <th>Actions</th>
             </tr>
         </thead>
         <tbody>
@@ -30,6 +31,9 @@ else
                     <td>@movie.Title</td>
                     <td>
                         <button @onclick="@(async () => await WatchMovie(movie.Id))">Watch</button>
+                    </td>
+                    <td>
+                        <button class="btn btn-danger btn-sm" @onclick="@(async () => await DeleteMovie(movie.Id))">Delete</button>
                     </td>
                 </tr>
             }
@@ -56,5 +60,15 @@ else
     {
         videoUrl = $"{baseUrl}/movies/stream/{movieId}";
         await InvokeAsync(StateHasChanged);
+    }
+
+    public async Task DeleteMovie(int movieId)
+    {
+        if (await MovieService.DeleteMovieAsync(movieId))
+        {
+            // Refresh the movie list after successful deletion
+            movieList = await MovieService.GetMoviesAsync();
+            await InvokeAsync(StateHasChanged);
+        }
     }
 }
