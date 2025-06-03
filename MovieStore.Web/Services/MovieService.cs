@@ -1,6 +1,7 @@
 ﻿using System.Net.Http;
 using System.Text.Json;
 using System.Threading;
+using System.Text;
 
 namespace MovieStore.Web;
 
@@ -29,6 +30,27 @@ public class MovieService(HttpClient httpClient)
             }
 
             return movies?.ToList() ?? [];
+    }
+
+    public async Task<Movie?> AddMovieAsync(Movie movie, CancellationToken cancellationToken = default)
+    {
+        var options = new JsonSerializerOptions
+        {
+            PropertyNameCaseInsensitive = true
+        };
+
+        var json = JsonSerializer.Serialize(movie, options);
+        var content = new StringContent(json, Encoding.UTF8, "application/json");
+
+        var response = await httpClient.PostAsync("/movies", content, cancellationToken);
+
+        if (response.IsSuccessStatusCode)
+        {
+            var responseContent = await response.Content.ReadAsStringAsync(cancellationToken);
+            return JsonSerializer.Deserialize<Movie>(responseContent, options);
+        }
+
+        return null;
     }
 
 }

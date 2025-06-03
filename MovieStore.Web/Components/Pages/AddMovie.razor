@@ -1,0 +1,100 @@
+@page "/add-movie"
+@rendermode InteractiveServer
+@inject MovieStore.Web.MovieService MovieService
+@inject NavigationManager NavigationManager
+
+<PageTitle>Add Movie</PageTitle>
+
+<h1>Add New Movie</h1>
+
+<div class="row">
+    <div class="col-md-6">
+        <EditForm Model="@newMovie" OnValidSubmit="@HandleSubmit">
+            <DataAnnotationsValidator />
+            <ValidationSummary />
+            
+            <div class="mb-3">
+                <label for="title" class="form-label">Title</label>
+                <InputText id="title" class="form-control" @bind-Value="newMovie.Title" />
+                <ValidationMessage For="@(() => newMovie.Title)" />
+            </div>
+            
+            <div class="mb-3">
+                <label for="fileName" class="form-label">File Name</label>
+                <InputText id="fileName" class="form-control" @bind-Value="newMovie.FileName" placeholder="e.g., movie.mp4" />
+                <ValidationMessage For="@(() => newMovie.FileName)" />
+            </div>
+            
+            <div class="mb-3">
+                <button type="submit" class="btn btn-primary" disabled="@isSubmitting">
+                    @if (isSubmitting)
+                    {
+                        <span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
+                        <text> Adding...</text>
+                    }
+                    else
+                    {
+                        <text>Add Movie</text>
+                    }
+                </button>
+                <a href="/movies" class="btn btn-secondary ms-2">Cancel</a>
+            </div>
+        </EditForm>
+
+        @if (!string.IsNullOrEmpty(errorMessage))
+        {
+            <div class="alert alert-danger" role="alert">
+                @errorMessage
+            </div>
+        }
+
+        @if (!string.IsNullOrEmpty(successMessage))
+        {
+            <div class="alert alert-success" role="alert">
+                @successMessage
+            </div>
+        }
+    </div>
+</div>
+
+@code {
+    private Movie newMovie = new Movie();
+    private bool isSubmitting = false;
+    private string? errorMessage;
+    private string? successMessage;
+
+    private async Task HandleSubmit()
+    {
+        isSubmitting = true;
+        errorMessage = null;
+        successMessage = null;
+
+        try
+        {
+            var result = await MovieService.AddMovieAsync(newMovie);
+            
+            if (result != null)
+            {
+                successMessage = $"Movie '{newMovie.Title}' has been added successfully!";
+                newMovie = new Movie(); // Reset form
+                StateHasChanged();
+                
+                // Navigate to movies page after a short delay
+                await Task.Delay(2000);
+                NavigationManager.NavigateTo("/movies");
+            }
+            else
+            {
+                errorMessage = "Failed to add the movie. Please try again.";
+            }
+        }
+        catch (Exception ex)
+        {
+            errorMessage = $"Error: {ex.Message}";
+        }
+        finally
+        {
+            isSubmitting = false;
+        }
+    }
+}
