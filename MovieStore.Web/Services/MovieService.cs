@@ -53,4 +53,10 @@ public class MovieService(HttpClient httpClient)
         return null;
     }
 
+    public async Task<bool> DeleteMovieAsync(int movieId, CancellationToken cancellationToken = default)
+    {
+        var response = await httpClient.DeleteAsync($"/movies/{movieId}", cancellationToken);
+        return response.IsSuccessStatusCode;
+    }
+
 }
