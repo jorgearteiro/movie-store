@@ -53,6 +53,32 @@ public class MovieService(HttpClient httpClient)
         return null;
     }
 
+    public async Task<Movie?> AddMovieWithFileAsync(string title, Stream fileStream, string fileName, string contentType, CancellationToken cancellationToken = default)
+    {
+        using var content = new MultipartFormDataContent();
+        
+        // Add title
+        content.Add(new StringContent(title), "title");
+        
+        // Add file
+        var fileContent = new StreamContent(fileStream);
+        fileContent.Headers.ContentType = new System.Net.Http.Headers.MediaTypeHeaderValue(contentType);
+        content.Add(fileContent, "file", fileName);
+
+        var response = await httpClient.PostAsync("/movies/upload", content, cancellationToken);
+
+        if (response.IsSuccessStatusCode)
+        {
+            var responseContent = await response.Content.ReadAsStringAsync(cancellationToken);
+            var options = new JsonSerializerOptions
+            {
+                PropertyNameCaseInsensitive = true
+            };
+            return JsonSerializer.Deserialize<Movie>(responseContent, options);
+        }
+
+        return null;
+
     public async Task<bool> DeleteMovieAsync(int movieId, CancellationToken cancellationToken = default)
     {
         var response = await httpClient.DeleteAsync($"/movies/{movieId}", cancellationToken);
