@@ -12,7 +12,24 @@ builder.AddServiceDefaults();
 builder.Services.AddProblemDetails();
 
 // Add Entity Framework and PostgreSQL
-builder.AddNpgsqlDbContext<MovieStoreContext>("moviestore");
+var connectionString = builder.Configuration.GetConnectionString("moviestore") 
+    ?? builder.Configuration.GetConnectionString("DefaultConnection")
+    ?? "Host=localhost;Database=moviestore;Username=postgres;Password=postgres";
+
+// Use SQLite for development/testing when no PostgreSQL is available
+var usePostgres = connectionString.Contains("Host=") || connectionString.Contains("Server=");
+
+builder.Services.AddDbContext<MovieStoreContext>(options =>
+{
+    if (usePostgres)
+    {
+        options.UseNpgsql(connectionString);
+    }
+    else
+    {
+        options.UseSqlite("Data Source=moviestore.db");
+    }
+});
 
 // Add CORS
 builder.Services.AddCors
