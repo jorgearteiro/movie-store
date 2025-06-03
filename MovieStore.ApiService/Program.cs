@@ -40,8 +40,8 @@ builder.Services.AddCors
         (
             builder =>
             {
-                builder.AllowAnyOrigin().AllowAnyMethod().AllowAnyHeader()
-                       .WithExposedHeaders("strict-origin-when-cross-origin");
+                builder.AllowAnyOrigin().AllowAnyMethod().AllowAnyHeader();
+                       //.WithExposedHeaders("strict-origin-when-cross-origin");
             }
         );
     }
@@ -59,7 +59,7 @@ using (var scope = app.Services.CreateScope())
 // Configure the HTTP request pipeline.
 app.UseExceptionHandler();
 
-app.UseCors();
+//app.UseCors();
 
 var videoApi = app.MapGroup("/movies");
 
