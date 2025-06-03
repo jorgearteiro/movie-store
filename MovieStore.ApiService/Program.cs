@@ -85,7 +85,7 @@ videoApi.MapPost("/upload", async (HttpRequest request, MovieStoreContext contex
     }
 
     var form = await request.ReadFormAsync();
-    
+
     var title = form["title"].ToString();
     if (string.IsNullOrEmpty(title))
     {
@@ -101,7 +101,7 @@ videoApi.MapPost("/upload", async (HttpRequest request, MovieStoreContext contex
     // Read file content
     using var memoryStream = new MemoryStream();
     await file.CopyToAsync(memoryStream);
-    
+
     var movie = new Movie
     {
         Title = title,
@@ -112,8 +112,9 @@ videoApi.MapPost("/upload", async (HttpRequest request, MovieStoreContext contex
 
     context.Movies.Add(movie);
     await context.SaveChangesAsync();
-    
+
     return Results.Created($"/movies/{movie.Id}", movie);
+});
 
 videoApi.MapDelete("/{id}", async (int id, MovieStoreContext context) =>
 {
