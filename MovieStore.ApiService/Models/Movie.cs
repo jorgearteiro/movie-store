@@ -12,4 +12,9 @@ public class Movie
     
     [MaxLength(255)]
     public string? FileName { get; set; }
+    
+    public byte[]? FileContent { get; set; }
+    
+    [MaxLength(100)]
+    public string? ContentType { get; set; }
 }

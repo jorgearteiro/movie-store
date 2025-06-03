@@ -20,9 +20,12 @@
             </div>
             
             <div class="mb-3">
-                <label for="fileName" class="form-label">File Name</label>
-                <InputText id="fileName" class="form-control" @bind-Value="newMovie.FileName" placeholder="e.g., movie.mp4" />
-                <ValidationMessage For="@(() => newMovie.FileName)" />
+                <label for="fileUpload" class="form-label">Select Movie File</label>
+                <InputFile id="fileUpload" class="form-control" OnChange="@OnFileSelected" accept="video/*" />
+                @if (!string.IsNullOrEmpty(selectedFileName))
+                {
+                    <div class="form-text text-success">Selected: @selectedFileName</div>
+                }
             </div>
             
             <div class="mb-3">
@@ -62,6 +65,15 @@
     private bool isSubmitting = false;
     private string? errorMessage;
     private string? successMessage;
+    private IBrowserFile? selectedFile;
+    private string? selectedFileName;
+
+    private void OnFileSelected(InputFileChangeEventArgs e)
+    {
+        selectedFile = e.File;
+        selectedFileName = e.File.Name;
+        StateHasChanged();
+    }
 
     private async Task HandleSubmit()
     {
@@ -71,12 +83,40 @@
 
         try
         {
-            var result = await MovieService.AddMovieAsync(newMovie);
+            if (string.IsNullOrWhiteSpace(newMovie.Title))
+            {
+                errorMessage = "Title is required.";
+                return;
+            }
+
+            if (selectedFile == null)
+            {
+                errorMessage = "Please select a file to upload.";
+                return;
+            }
+
+            // Limit file size to 100MB
+            const long maxFileSize = 100 * 1024 * 1024;
+            if (selectedFile.Size > maxFileSize)
+            {
+                errorMessage = "File size cannot exceed 100MB.";
+                return;
+            }
+
+            using var stream = selectedFile.OpenReadStream(maxFileSize);
+            var result = await MovieService.AddMovieWithFileAsync(
+                newMovie.Title, 
+                stream, 
+                selectedFile.Name, 
+                selectedFile.ContentType,
+                CancellationToken.None);
             
             if (result != null)
             {
                 successMessage = $"Movie '{newMovie.Title}' has been added successfully!";
                 newMovie = new Movie(); // Reset form
+                selectedFile = null;
+                selectedFileName = null;
                 StateHasChanged();
                 
                 // Navigate to movies page after a short delay
