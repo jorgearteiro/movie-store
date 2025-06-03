@@ -1,4 +1,7 @@
 using System.Text.Json.Serialization;
+using Microsoft.EntityFrameworkCore;
+using MovieStore.ApiService.Data;
+using MovieStore.ApiService.Models;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -7,6 +10,26 @@ builder.AddServiceDefaults();
 
 // Add services to the container.
 builder.Services.AddProblemDetails();
+
+// Add Entity Framework and PostgreSQL
+var connectionString = builder.Configuration.GetConnectionString("moviestore") 
+    ?? builder.Configuration.GetConnectionString("DefaultConnection")
+    ?? "Host=localhost;Database=moviestore;Username=postgres;Password=postgres";
+
+// Use SQLite for development/testing when no PostgreSQL is available
+var usePostgres = connectionString.Contains("Host=") || connectionString.Contains("Server=");
+
+builder.Services.AddDbContext<MovieStoreContext>(options =>
+{
+    if (usePostgres)
+    {
+        options.UseNpgsql(connectionString);
+    }
+    else
+    {
+        options.UseSqlite("Data Source=moviestore.db");
+    }
+});
 
 // Add CORS
 builder.Services.AddCors
@@ -26,35 +49,43 @@ builder.Services.AddCors
 
 var app = builder.Build();
 
+// Ensure database is created
+using (var scope = app.Services.CreateScope())
+{
+    var context = scope.ServiceProvider.GetRequiredService<MovieStoreContext>();
+    context.Database.EnsureCreated();
+}
+
 // Configure the HTTP request pipeline.
 app.UseExceptionHandler();
 
-var moviesCatalog = new List<MovieObj> {
-    new(1, "AKS Container Storage Kafka Demo", "aks-storage-kafka.mp4"),
-    new(2, "The Matrix", "matrix.mp4"),
-    new(3, "Interstellar", "interstellar.mp4"),
-    new(4, "The Dark Knight", "dark_knight.mp4"),
-    new(5, "Pulp Fiction", "pulp_fiction.mp4")
-};
-
 var videoApi = app.MapGroup("/movies");
 
-videoApi.MapGet("/", async () => await Task.FromResult(moviesCatalog));
+videoApi.MapGet("/", async (MovieStoreContext context) => 
+    await context.Movies.ToListAsync());
 
-videoApi.MapGet("/{id}", (int id) =>
-    moviesCatalog.FirstOrDefault(a => a.Id == id) is { } movie
-        ? Results.Ok(movie)
-        : Results.NotFound());
-
-videoApi.MapGet("/stream/{id}", (int id) =>
+videoApi.MapGet("/{id}", async (int id, MovieStoreContext context) =>
 {
-    var movie = moviesCatalog.FirstOrDefault(m => m.Id == id);
+    var movie = await context.Movies.FindAsync(id);
+    return movie is not null ? Results.Ok(movie) : Results.NotFound();
+});
+
+videoApi.MapPost("/", async (Movie movie, MovieStoreContext context) =>
+{
+    context.Movies.Add(movie);
+    await context.SaveChangesAsync();
+    return Results.Created($"/movies/{movie.Id}", movie);
+});
+
+videoApi.MapGet("/stream/{id}", async (int id, MovieStoreContext context) =>
+{
+    var movie = await context.Movies.FindAsync(id);
     if (movie == null)
     {
         return Results.NotFound();
     }
 
-    string path = Path.Combine(AppContext.BaseDirectory, "files/", movie.FileName);
+    string path = Path.Combine(AppContext.BaseDirectory, "files/", movie.FileName ?? "");
 
     if (!System.IO.File.Exists(path))
     {
@@ -77,21 +108,7 @@ app.UseCors();
 
 app.Run();
 
-public class MovieObj
-{
-    public int Id { get; set; }
-    public string? Title { get; set; }
-    public string? FileName { get; set; }
-
-    public MovieObj(int id, string title, string fileName)
-    {
-        Id = id;
-        Title = title;
-        FileName = fileName;
-    }
-}
-
-[JsonSerializable(typeof(List<MovieObj>[]))]
+[JsonSerializable(typeof(List<Movie>[]))]
 internal partial class AppJsonSerializerContext : JsonSerializerContext
 {
 

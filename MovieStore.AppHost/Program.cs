@@ -1,7 +1,13 @@
-
 var builder = DistributedApplication.CreateBuilder(args);
 
-var apiService = builder.AddProject<Projects.MovieStore_ApiService>("apiservice");
+var postgres = builder.AddPostgres("postgres")
+    .WithEnvironment("POSTGRES_DB", "moviestore")
+    .WithDataVolume()
+    .WithLifetime(ContainerLifetime.Persistent)
+    .AddDatabase("moviestore");
+
+var apiService = builder.AddProject<Projects.MovieStore_ApiService>("apiservice")
+    .WithReference(postgres);
 
 builder.AddProject<Projects.MovieStore_Web>("webfrontend")
     .WithExternalHttpEndpoints()
