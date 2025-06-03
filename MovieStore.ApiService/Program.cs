@@ -8,6 +8,20 @@ var builder = WebApplication.CreateBuilder(args);
 // Add service defaults & Aspire client integrations.
 builder.AddServiceDefaults();
 
+// Configure Kestrel for large file uploads
+builder.Services.Configure<Microsoft.AspNetCore.Server.Kestrel.Core.KestrelServerOptions>(options =>
+{
+    options.Limits.MaxRequestBodySize = 500 * 1024 * 1024; // 500MB limit for video files
+});
+
+// Configure form options for large multipart uploads
+builder.Services.Configure<Microsoft.AspNetCore.Http.Features.FormOptions>(options =>
+{
+    options.ValueLengthLimit = int.MaxValue;
+    options.MultipartBodyLengthLimit = 500 * 1024 * 1024; // 500MB
+    options.MultipartHeadersLengthLimit = int.MaxValue;
+});
+
 // Add services to the container.
 builder.Services.AddProblemDetails();
 
@@ -40,8 +54,8 @@ builder.Services.AddCors
         (
             builder =>
             {
-                builder.AllowAnyOrigin().AllowAnyMethod().AllowAnyHeader()
-                       .WithExposedHeaders("strict-origin-when-cross-origin");
+                builder.AllowAnyOrigin().AllowAnyMethod().AllowAnyHeader();
+                       //.WithExposedHeaders("strict-origin-when-cross-origin");
             }
         );
     }
@@ -58,6 +72,8 @@ using (var scope = app.Services.CreateScope())
 
 // Configure the HTTP request pipeline.
 app.UseExceptionHandler();
+
+app.UseCors();
 
 var videoApi = app.MapGroup("/movies");
 
@@ -165,11 +181,9 @@ videoApi.MapGet("/stream/{id}", async (int id, MovieStoreContext context) =>
 
 app.MapDefaultEndpoints();
 
-app.UseCors();
-
 app.Run();
 
-[JsonSerializable(typeof(List<Movie>[]))]
+[JsonSerializable(typeof(List<Movie>))]
 internal partial class AppJsonSerializerContext : JsonSerializerContext
 {
 

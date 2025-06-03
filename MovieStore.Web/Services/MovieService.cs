@@ -55,13 +55,26 @@ public class MovieService(HttpClient httpClient)
 
     public async Task<Movie?> AddMovieWithFileAsync(string title, Stream fileStream, string fileName, string contentType, CancellationToken cancellationToken = default)
     {
+        // Create a memory stream copy to avoid stream consumption issues
+        using var memoryStream = new MemoryStream();
+        
+        // Reset stream position to beginning if possible
+        if (fileStream.CanSeek)
+        {
+            fileStream.Position = 0;
+        }
+        
+        // Copy the stream to memory to avoid consumption issues
+        await fileStream.CopyToAsync(memoryStream, cancellationToken);
+        memoryStream.Position = 0; // Reset position for reading
+
         using var content = new MultipartFormDataContent();
 
         // Add title
         content.Add(new StringContent(title), "title");
 
         // Add file
-        var fileContent = new StreamContent(fileStream);
+        var fileContent = new StreamContent(memoryStream);
         fileContent.Headers.ContentType = new System.Net.Http.Headers.MediaTypeHeaderValue(contentType);
         content.Add(fileContent, "file", fileName);
 
