@@ -59,6 +59,8 @@ using (var scope = app.Services.CreateScope())
 // Configure the HTTP request pipeline.
 app.UseExceptionHandler();
 
+app.UseCors();
+
 var videoApi = app.MapGroup("/movies");
 
 videoApi.MapGet("/", async (MovieStoreContext context) => 
@@ -165,11 +167,9 @@ videoApi.MapGet("/stream/{id}", async (int id, MovieStoreContext context) =>
 
 app.MapDefaultEndpoints();
 
-app.UseCors();
-
 app.Run();
 
-[JsonSerializable(typeof(List<Movie>[]))]
+[JsonSerializable(typeof(List<Movie>))]
 internal partial class AppJsonSerializerContext : JsonSerializerContext
 {
 
