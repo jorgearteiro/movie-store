@@ -8,6 +8,20 @@ var builder = WebApplication.CreateBuilder(args);
 // Add service defaults & Aspire client integrations.
 builder.AddServiceDefaults();
 
+// Configure Kestrel for large file uploads
+builder.Services.Configure<Microsoft.AspNetCore.Server.Kestrel.Core.KestrelServerOptions>(options =>
+{
+    options.Limits.MaxRequestBodySize = 500 * 1024 * 1024; // 500MB limit for video files
+});
+
+// Configure form options for large multipart uploads
+builder.Services.Configure<Microsoft.AspNetCore.Http.Features.FormOptions>(options =>
+{
+    options.ValueLengthLimit = int.MaxValue;
+    options.MultipartBodyLengthLimit = 500 * 1024 * 1024; // 500MB
+    options.MultipartHeadersLengthLimit = int.MaxValue;
+});
+
 // Add services to the container.
 builder.Services.AddProblemDetails();
 
